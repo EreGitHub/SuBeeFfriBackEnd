@@ -1,0 +1,1 @@
+Scaffold-DbContext "Data Source=EreDeveloper;Initial Catalog=SuBeefrri;User ID=sa;Password=Control123+" Microsoft.EntityFrameworkCore.SqlServer -OutputDir DataContext
