@@ -58,6 +58,7 @@ namespace SuBeefrri.Services.Repository
             oPersona.Apellidos = dto.Apellidos;
             oPersona.Ci = dto.Ci;
             oPersona.Direccion = dto.Direccion;
+            oPersona.DireccionFoto = dto.DireccionFoto;
             await Context.SaveChangesAsync();
         }
 

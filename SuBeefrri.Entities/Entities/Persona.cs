@@ -15,6 +15,7 @@ namespace SuBeefrri.Core.Entities
         public string? Apellidos { get; set; }
         public string Ci { get; set; } = null!;
         public string? Direccion { get; set; }
+        public string? DireccionFoto { get; set; }
 
         public virtual ICollection<Usuario> Usuarios { get; set; }
     }

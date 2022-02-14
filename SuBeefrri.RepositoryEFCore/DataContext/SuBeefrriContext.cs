@@ -121,6 +121,10 @@ namespace SuBeefrri.Contexts.DataContext
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
+                entity.Property(e => e.DireccionFoto)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Nombres)
                     .HasMaxLength(100)
                     .IsUnicode(false);
