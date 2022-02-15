@@ -29,6 +29,7 @@ Nombres varchar(100) not null,
 Apellidos varchar(100),
 Ci varchar(100) not null,
 Direccion varchar(100),
+DireccionFoto varchar(100),
 constraint pk_Persona primary key(IdPersona)
 );
 
@@ -109,7 +110,7 @@ select * from Sucursal
 insert into Sucursal values('Siucursal 1','Sin Direccion'),('Siucursal 2','Sin Direccion'),('Siucursal 3','Sin Direccion'),('Siucursal 4','Sin Direccion')
 
 select * from Persona
-insert into Persona values('Juan Perez','Rios','12334','Sin Direccion'),('Pedro Juan','Ortega','765464','Sin Direccion')
+insert into Persona values('Juan Perez','Rios','12334','Sin Direccion',null),('Pedro Juan','Ortega','765464','Sin Direccion',null)
 
 select * from TipoUsuario
 insert into TipoUsuario values('Adm'),('Cliente')
