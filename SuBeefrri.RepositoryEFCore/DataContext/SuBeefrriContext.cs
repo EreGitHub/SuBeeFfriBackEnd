@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using SuBeefrri.Core.Dtos;
 using SuBeefrri.Core.Entities;
 
 namespace SuBeefrri.Contexts.DataContext
@@ -28,8 +29,11 @@ namespace SuBeefrri.Contexts.DataContext
         public virtual DbSet<TipoUsuario> TipoUsuarios { get; set; } = null!;
         public virtual DbSet<Usuario> Usuarios { get; set; } = null!;
 
+        public DbSet<Report1DTO> Reporte1 { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Report1DTO>().HasNoKey().ToView(null);
+
             modelBuilder.Entity<Cobro>(entity =>
             {
                 entity.HasKey(e => e.IdCobro)

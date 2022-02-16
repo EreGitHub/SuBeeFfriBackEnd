@@ -92,6 +92,35 @@ namespace SuBeefrri.Services.Repository
             return lst;
         }
 
+        public async Task<List<ProductosPorUsuarioDTO>> ListarOrdenesPorUsuario(int idUsuario)
+        {
+            List<ProductosPorUsuarioDTO> lst = new List<ProductosPorUsuarioDTO>();
+            var oUsuario = await Context.Usuarios.SingleOrDefaultAsync(q => q.IdUsuario == idUsuario);
+            var orderPedido = await Context.OrderPedidos.Where(q => q.IdUsuario == idUsuario).ToListAsync();
+            var oSucursal = await Context.Sucursals.SingleOrDefaultAsync(q => q.IdSucursal == oUsuario.IdSucursal);
+            foreach (var itemOrden in orderPedido)
+            {
+
+                var lstDetalle = await Context.DetallePedidos.Where(q => q.IdPedido == itemOrden.IdPedido).ToListAsync();
+                foreach (var itemDetalle in lstDetalle)
+                {
+                    var oProduct = await Context.Productos.SingleOrDefaultAsync(q => q.IdProducto == itemDetalle.IdProducto);
+                    lst.Add(new ProductosPorUsuarioDTO
+                    {
+                        IdPerdido = itemOrden.IdPedido,
+                        NombreProducto = oProduct.Nombre,
+                        NombreSucursal = oSucursal.Nombre,
+                        NumeroPedido = itemOrden.NroPedido,
+                        Cantidad = itemDetalle.Cantidad,
+                        SubTotal = itemDetalle.SubTotal,
+                        Fecha = itemOrden.Fecha,
+                        Estado = itemOrden.Estado
+                    });
+                }
+            }
+            return lst;
+        }
+
         public async Task Aprobar(int idPedido)
         {
             var oOrden = await Context.OrderPedidos.SingleOrDefaultAsync(o => o.IdPedido == idPedido);
@@ -99,6 +128,29 @@ namespace SuBeefrri.Services.Repository
                 throw new CustomException("El numero de orden proporcionado no existe");
             oOrden!.Estado = EstadoOrden.Aprobado.ToString();
             await Context.SaveChangesAsync();
+        }
+
+        public async Task Cobrar(int idPedido, int idUsuarioCobrador)
+        {
+            var ordenPedidos = await Context.OrderPedidos.Where(q => q.IdPedido == idPedido).FirstOrDefaultAsync();
+            ordenPedidos.Estado = EstadoOrden.Cobrado.ToString();
+            Context.SaveChanges();
+            var DetallePedido = await Context.DetallePedidos.Where(q => q.IdPedido == idPedido).ToListAsync();
+            foreach (var item in DetallePedido)
+            {
+                Entrega entrega = new Entrega();
+                entrega.Fecha = DateTime.Now;
+                entrega.Estado = 1;
+                entrega.IdDetalle = item.IdDetalle;
+                Context.Entregas.Add(entrega);
+                Context.SaveChanges();
+                Cobro cobro = new Cobro();
+                cobro.FechaCobro = DateTime.Now;
+                cobro.IdUsuario = idUsuarioCobrador;
+                cobro.IdEntrega = entrega.IdEntrega;
+                Context.Cobros.Add(cobro);
+                Context.SaveChanges();
+            }            
         }
 
         public async Task Rechazar(int idPedido)

@@ -75,6 +75,7 @@ builder.Services.AddScoped<ITipoUsuarioRepository, TipoUsuarioRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddTransient<IMail, Mail>();
+builder.Services.AddScoped<IReporteRepository, ReporteRepository>();
 //end inyeccion
 
 builder.Services.AddCors(options =>

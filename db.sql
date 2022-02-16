@@ -129,3 +129,32 @@ insert into Producto values ('Producto 3',GETDATE(),10,20,10,10,1)
 insert into Producto values ('Producto 4',GETDATE(),10,20,10,10,1)
 insert into Producto values ('Producto 5',GETDATE(),10,20,10,10,1)
 insert into Producto values ('Producto 6',GETDATE(),10,20,10,10,1)
+
+--exec sp_reporte1
+alter procedure sp_Reporte1
+as
+begin
+SELECT        Sucursal.IdSucursal, Sucursal.Nombre NombreSucursal, Sucursal.Direccion, Producto.Nombre AS NombreProducto, Producto.Precio_Entrega, Producto.Precio_Venta, Proveedor.Nombre AS NombreProveedor
+into #temp1
+FROM            Sucursal INNER JOIN
+                         Usuario ON Sucursal.IdSucursal = Usuario.IdSucursal INNER JOIN
+                         OrderPedido ON Usuario.IdUsuario = OrderPedido.IdUsuario INNER JOIN
+                         DetallePedido ON OrderPedido.IdPedido = DetallePedido.IdPedido INNER JOIN
+                         Producto ON DetallePedido.IdProducto = Producto.IdProducto INNER JOIN
+                         Proveedor ON Producto.IdProveedor = Proveedor.IdProveedor
+ORDER BY Sucursal.IdSucursal
+
+select top 1 IdSucursal, COUNT(IdSucursal) cantidad
+into #tempSucursal
+from #temp1
+group by IdSucursal
+order by 2 desc
+
+select * from #temp1 
+where IdSucursal= (select IdSucursal from #tempSucursal)
+drop table #temp1
+drop table #tempSucursal
+end
+go
+
+select * from Sucursal

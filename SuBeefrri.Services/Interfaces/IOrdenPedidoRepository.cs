@@ -6,7 +6,9 @@ namespace SuBeefrri.Services.Interfaces
     {
         Task Aprobar(int idPedido);
         Task<IEnumerable<OrdenesListaDTO>> ListarOrdenes();
+        Task<List<ProductosPorUsuarioDTO>> ListarOrdenesPorUsuario(int idUsuario);
         Task<OrdenPedidoDTO> Orden(OrdenPedidoDTO dto);
+        Task Cobrar(int idPedido, int idUsuarioCobrador);
         Task Rechazar(int idPedido);
     }
 }

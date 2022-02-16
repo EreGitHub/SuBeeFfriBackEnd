@@ -21,11 +21,24 @@ namespace SuBeefrri.Api.Controllers
             return Ok(await Repository.ListarOrdenes());
         }
 
+        [HttpGet("{idUsuario}")]
+        public async Task<IActionResult> ListarOrdenesPorUsuario(int idUsuario)
+        {
+            return Ok(await Repository.ListarOrdenesPorUsuario(idUsuario));
+        }
+
         [HttpPost]
         public async Task<IActionResult> Orden(OrdenPedidoDTO dto)
         {
             var oOrden = await Repository.Orden(dto);
             return Ok(oOrden);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Cobrar(int idPedido, int idUsuarioCobrador)
+        {
+            await Repository.Cobrar(idPedido, idUsuarioCobrador);
+            return Ok();
         }
 
         [HttpPost("{idPedido}")]
