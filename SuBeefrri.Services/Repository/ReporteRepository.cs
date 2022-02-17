@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SuBeefrri.Contexts.DataContext;
 using SuBeefrri.Core.Dtos;
@@ -23,7 +24,7 @@ namespace SuBeefrri.Services.Repository
             {
                 IdSucursal = responce[0].IdSucursal,
                 NombreSucursal = responce[0].NombreSucursal,
-                Direccion=responce[0].Direccion,
+                Direccion = responce[0].Direccion,
             };
             foreach (var item in responce)
             {
@@ -33,6 +34,27 @@ namespace SuBeefrri.Services.Repository
                     Precio_Entrega = item.Precio_Entrega,
                     Precio_Venta = item.Precio_Venta,
                     NombreProveedor = item.NombreProveedor
+                });
+            }
+            return obj;
+        }
+
+        public async Task<Reporte2ResponceDTO> Reporte2(int numeroMes)
+        {
+            var responce = Context.Set<Reporte2DTO>().FromSqlRaw($"exec sp_Reporte2 {numeroMes}").ToList();
+            var obj = new Reporte2ResponceDTO
+            {
+                MontoTotal = responce[0].MontoTotal
+            };
+            foreach (var item in responce)
+            {
+                obj.Items.Add(new Item
+                {
+                    NombreProducto = item.NombreProducto,
+                    Precio_Entrega = item.Precio_Venta,
+                    Precio_Venta = item.Precio_Venta,
+                    Proveedor = item.Proveedor,
+                    Cantidad = item.Cantidad
                 });
             }
             return obj;

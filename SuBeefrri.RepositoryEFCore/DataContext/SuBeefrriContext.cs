@@ -30,9 +30,11 @@ namespace SuBeefrri.Contexts.DataContext
         public virtual DbSet<Usuario> Usuarios { get; set; } = null!;
 
         public DbSet<Report1DTO> Reporte1 { get; set; }
+        public DbSet<Reporte2DTO> Reporte2 { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Report1DTO>().HasNoKey().ToView(null);
+            modelBuilder.Entity<Reporte2DTO>().HasNoKey().ToView(null);
 
             modelBuilder.Entity<Cobro>(entity =>
             {

@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SuBeefrri.Services.Interfaces;
 
 namespace SuBeefrri.Api.Controllers
@@ -8,16 +7,22 @@ namespace SuBeefrri.Api.Controllers
     [ApiController]
     public class ReporteController : ControllerBase
     {
-        private readonly IReporteRepository Repository;        
+        private readonly IReporteRepository Repository;
         public ReporteController(IReporteRepository repository)
         {
-            Repository = repository;            
+            Repository = repository;
         }
 
         [HttpGet]
-        public async Task<IActionResult> All()
+        public async Task<IActionResult> Reporte1()
         {
             return Ok(await Repository.Reporte1());
+        }
+
+        [HttpGet("{numeroMes}")]
+        public async Task<IActionResult> Reporte2(int numeroMes)
+        {
+            return Ok(await Repository.Reporte2(numeroMes));
         }
     }
 }

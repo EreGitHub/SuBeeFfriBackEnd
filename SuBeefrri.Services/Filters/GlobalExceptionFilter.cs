@@ -14,6 +14,7 @@ namespace SuBeefrri.Services.Filters
                 exception = ((CustomException)context.Exception).Message;
             else
                 exception = "Ocurrio un error interno...!!!";
+            var f = context.Exception;
             context.Result = new BadRequestObjectResult(exception);
             context.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
             context.ExceptionHandled = true;

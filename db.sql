@@ -131,7 +131,7 @@ insert into Producto values ('Producto 5',GETDATE(),10,20,10,10,1)
 insert into Producto values ('Producto 6',GETDATE(),10,20,10,10,1)
 
 --exec sp_reporte1
-alter procedure sp_Reporte1
+create procedure sp_Reporte1
 as
 begin
 SELECT        Sucursal.IdSucursal, Sucursal.Nombre NombreSucursal, Sucursal.Direccion, Producto.Nombre AS NombreProducto, Producto.Precio_Entrega, Producto.Precio_Venta, Proveedor.Nombre AS NombreProveedor
@@ -157,4 +157,29 @@ drop table #tempSucursal
 end
 go
 
-select * from Sucursal
+exec sp_Reporte2 2
+create procedure sp_Reporte2
+@mes int
+as
+begin
+
+SELECT Producto.IdProducto,Producto.Nombre as NombreProducto, Producto.Precio_Entrega, Producto.Precio_Venta,DetallePedido.SubTotal,
+DetallePedido.Cantidad,OrderPedido.Fecha FechaPedido,Proveedor.Nombre AS Proveedor, Sucursal.Nombre AS Sucursal
+into #temp2
+FROM            Sucursal INNER JOIN
+                         Usuario ON Sucursal.IdSucursal = Usuario.IdSucursal INNER JOIN
+                         OrderPedido ON Usuario.IdUsuario = OrderPedido.IdUsuario INNER JOIN
+                         DetallePedido ON OrderPedido.IdPedido = DetallePedido.IdPedido INNER JOIN
+                         Producto ON DetallePedido.IdProducto = Producto.IdProducto INNER JOIN
+                         Proveedor ON Producto.IdProveedor = Proveedor.IdProveedor
+where  CONVERT(VARCHAR(2),MONTH(OrderPedido.Fecha))=@mes
+
+select (select SUM(SubTotal) from #temp2) MontoTotal, NombreProducto,Precio_Entrega,Precio_Venta,Proveedor, sum(#temp2.Cantidad) Cantidad
+from #temp2
+group by NombreProducto, Precio_Entrega, Precio_Venta,Proveedor
+order by 6 desc 
+
+drop table #temp2
+end 
+go
+
