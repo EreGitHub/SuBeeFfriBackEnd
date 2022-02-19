@@ -10,5 +10,6 @@
         public int Cantidad { get; set; }
         public int SubTotal { get; set; }
         public string Estado { get; set; }
+        public string DireccionFoto { get; set; }
     }
 }

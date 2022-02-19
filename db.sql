@@ -72,6 +72,7 @@ Precio_Venta decimal(7,2) not null,
 Stock int not null,
 Peso decimal(7,2)not null,
 IdProveedor int not null,
+DireccionFoto varchar(100),
 constraint pk_Producto primary key(IdProducto),
 constraint fk_Proveedor_Producto foreign key(IdProveedor) references Proveedor(IdProveedor) on update cascade on delete cascade,
 );
@@ -123,13 +124,13 @@ select * from Proveedor
 insert into Proveedor values('Proveedor 1','Sin Nit'),('Proveedor 2','Sin Nit'),('Proveedor 3','Sin Nit'),('Proveedor 4','Sin Nit')
 
 select * from Producto 
-insert into Producto values ('Producto 1',GETDATE(),10,20,10,10,1)
-insert into Producto values ('Producto 2',GETDATE(),10,20,10,10,1)
-insert into Producto values ('Producto 3',GETDATE(),10,20,10,10,1)
-insert into Producto values ('Producto 4',GETDATE(),10,20,10,10,1)
-insert into Producto values ('Producto 5',GETDATE(),10,20,10,10,1)
-insert into Producto values ('Producto 6',GETDATE(),10,20,10,10,1)
-
+insert into Producto values ('Producto 1',GETDATE(),10,20,10,10,1,null)
+insert into Producto values ('Producto 2',GETDATE(),10,20,10,10,1,null)
+insert into Producto values ('Producto 3',GETDATE(),10,20,10,10,1,null)
+insert into Producto values ('Producto 4',GETDATE(),10,20,10,10,1,null)
+insert into Producto values ('Producto 5',GETDATE(),10,20,10,10,1,null)
+insert into Producto values ('Producto 6',GETDATE(),10,20,10,10,1,null)
+go
 --exec sp_reporte1
 create procedure sp_Reporte1
 as
@@ -157,7 +158,7 @@ drop table #tempSucursal
 end
 go
 
-exec sp_Reporte2 2
+--exec sp_Reporte2 2
 create procedure sp_Reporte2
 @mes int
 as
@@ -183,3 +184,4 @@ drop table #temp2
 end 
 go
 
+select * from OrderPedido

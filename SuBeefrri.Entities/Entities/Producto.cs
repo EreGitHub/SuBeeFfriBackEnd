@@ -18,6 +18,7 @@ namespace SuBeefrri.Core.Entities
         public int Stock { get; set; }
         public decimal Peso { get; set; }
         public int IdProveedor { get; set; }
+        public string? DireccionFoto { get; set; }
 
         public virtual Proveedor IdProveedorNavigation { get; set; } = null!;
         public virtual ICollection<DetallePedido> DetallePedidos { get; set; }

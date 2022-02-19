@@ -12,6 +12,6 @@ namespace SuBeefrri.Core.Dtos
         public decimal PrecioVenta { get; set; }
         public int Stock { get; set; }
         public decimal Peso { get; set; }
-        public int IdProveedor { get; set; }
+        public int IdProveedor { get; set; }        
     }
 }

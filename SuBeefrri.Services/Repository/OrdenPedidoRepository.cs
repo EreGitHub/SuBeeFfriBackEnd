@@ -114,7 +114,8 @@ namespace SuBeefrri.Services.Repository
                         Cantidad = itemDetalle.Cantidad,
                         SubTotal = itemDetalle.SubTotal,
                         Fecha = itemOrden.Fecha,
-                        Estado = itemOrden.Estado
+                        Estado = itemOrden.Estado,
+                        DireccionFoto = oProduct.DireccionFoto
                     });
                 }
             }
@@ -150,7 +151,7 @@ namespace SuBeefrri.Services.Repository
                 cobro.IdEntrega = entrega.IdEntrega;
                 Context.Cobros.Add(cobro);
                 Context.SaveChanges();
-            }            
+            }
         }
 
         public async Task Rechazar(int idPedido)

@@ -34,6 +34,7 @@ namespace SuBeefrri.Services.Repository
                     PrecioEntrega = item.PrecioEntrega,
                     PrecioVenta = item.PrecioVenta,
                     Stock = item.Stock,
+                    DireccionFoto = item.DireccionFoto,
                     Proveedor = Mapper.Map<ProveedorDTO>(await Context.Proveedors.SingleOrDefaultAsync(p => p.IdProveedor == item.IdProveedor))
                 });
             }
@@ -64,6 +65,17 @@ namespace SuBeefrri.Services.Repository
             Context.Add(oProducto);
             await Context.SaveChangesAsync();
             return Mapper.Map<ProductoDTO>(oProducto);
+        }
+
+        public async Task GuardarFoto(int idProducto, string direccionFoto)
+        {
+            var objProducto = await Context.Productos.FirstOrDefaultAsync(q => q.IdProducto == idProducto);
+            if (objProducto == null)
+                throw new CustomException("El registro seleccionado no existe");
+
+            objProducto.DireccionFoto = direccionFoto;
+            Context.Update(objProducto);
+            await Context.SaveChangesAsync();
         }
 
         public async Task Update(int id, ProductoDTO dto)

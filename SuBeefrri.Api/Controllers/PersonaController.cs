@@ -10,7 +10,6 @@ namespace SuBeefrri.Api.Controllers
     {
         private readonly IPersonaRepository Repository;
         private readonly IWebHostEnvironment HostEnvironment;
-
         public PersonaController(IPersonaRepository repository, IWebHostEnvironment hostEnvironment)
         {
             Repository = repository;

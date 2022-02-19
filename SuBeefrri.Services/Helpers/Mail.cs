@@ -36,7 +36,7 @@ namespace SuBeefrri.Services.Helpers
             string Host = "smtp.office365.com";
             int Puerto = 587;
             string Remitente = "tj.ruben.lupate.c@upds.net.bo";
-            string Contraseña = "u.71806877";
+            string Contraseña = "u.7180687";
 
             string Destinatarios = "rtayler561@gmail.com";//"tj.luis.cruz.g@upds.net.bo";
             string CC = "";
