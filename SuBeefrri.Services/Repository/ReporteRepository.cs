@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SuBeefrri.Contexts.DataContext;
 using SuBeefrri.Core.Dtos;
@@ -17,9 +16,12 @@ namespace SuBeefrri.Services.Repository
             Mapper = mapper;
         }
 
-        public async Task<Reporte1ResponceDTO> Reporte1()
+        public async Task<Reporte1ResponceDTO> Reporte1(DateTime fechaInicio, DateTime fechaFin)
         {
-            var responce = Context.Set<Report1DTO>().FromSqlRaw("sp_reporte1").ToList();
+            string _fechaInicio = fechaInicio.ToString("MM/dd/yy");
+            string _fechaFin = fechaFin.ToString("MM/dd/yy");
+            var query = $"sp_reporte1 '{_fechaInicio}', '{_fechaFin}'";
+            var responce = await Context.Set<Report1DTO>().FromSqlRaw(query).ToListAsync();
             var obj = new Reporte1ResponceDTO
             {
                 IdSucursal = responce[0].IdSucursal,
@@ -39,9 +41,12 @@ namespace SuBeefrri.Services.Repository
             return obj;
         }
 
-        public async Task<Reporte2ResponceDTO> Reporte2(int numeroMes)
+        public async Task<Reporte2ResponceDTO> Reporte2(DateTime fechaInicio, DateTime fechaFin)
         {
-            var responce = Context.Set<Reporte2DTO>().FromSqlRaw($"exec sp_Reporte2 {numeroMes}").ToList();
+            string _fechaInicio = fechaInicio.ToString("MM/dd/yy");
+            string _fechaFin = fechaFin.ToString("MM/dd/yy");
+            string query = $"exec sp_ReporteProductosMasVendidos '{_fechaInicio}', '{_fechaFin}'";
+            var responce = await Context.Set<Reporte2DTO>().FromSqlRaw(query).ToListAsync();
             var obj = new Reporte2ResponceDTO
             {
                 MontoTotal = responce[0].MontoTotal

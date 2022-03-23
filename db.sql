@@ -131,11 +131,19 @@ insert into Producto values ('Producto 4',GETDATE(),10,20,10,10,1,null)
 insert into Producto values ('Producto 5',GETDATE(),10,20,10,10,1,null)
 insert into Producto values ('Producto 6',GETDATE(),10,20,10,10,1,null)
 go
---exec sp_reporte1
-create procedure sp_Reporte1
+
+--declare @fechaInicio varchar(50)
+--set @fechaInicio='02/19/22'
+--declare @fechaFin varchar(50)
+--set @fechaFin='03/23/22'
+--exec sp_ReporteSucursalConMasPedidos @fechaInicio,@fechaFin
+create procedure sp_ReporteSucursalConMasPedidos
+@fechaInicio varchar(50),
+@fechaFin varchar(50)
 as
 begin
-SELECT        Sucursal.IdSucursal, Sucursal.Nombre NombreSucursal, Sucursal.Direccion, Producto.Nombre AS NombreProducto, Producto.Precio_Entrega, Producto.Precio_Venta, Proveedor.Nombre AS NombreProveedor
+SELECT Sucursal.IdSucursal, Sucursal.Nombre NombreSucursal, Sucursal.Direccion, Producto.Nombre AS NombreProducto, 
+Producto.Precio_Entrega, Producto.Precio_Venta, Proveedor.Nombre AS NombreProveedor,OrderPedido.Fecha
 into #temp1
 FROM            Sucursal INNER JOIN
                          Usuario ON Sucursal.IdSucursal = Usuario.IdSucursal INNER JOIN
@@ -143,6 +151,7 @@ FROM            Sucursal INNER JOIN
                          DetallePedido ON OrderPedido.IdPedido = DetallePedido.IdPedido INNER JOIN
                          Producto ON DetallePedido.IdProducto = Producto.IdProducto INNER JOIN
                          Proveedor ON Producto.IdProveedor = Proveedor.IdProveedor
+where (convert(varchar, Fecha, 1) between @fechaInicio and @fechaFin) and OrderPedido.Estado='Cobrado'
 ORDER BY Sucursal.IdSucursal
 
 select top 1 IdSucursal, COUNT(IdSucursal) cantidad
@@ -158,9 +167,14 @@ drop table #tempSucursal
 end
 go
 
---exec sp_Reporte2 2
-create procedure sp_Reporte2
-@mes int
+--declare @fechaInicio varchar(50)
+--set @fechaInicio='02/19/22'
+--declare @fechaFin varchar(50)
+--set @fechaFin='03/23/22'
+--exec sp_ReporteProductosMasVendidos @fechaInicio,@fechaFin	
+create procedure sp_ReporteProductosMasVendidos
+@fechaInicio varchar(50),
+@fechaFin varchar(50)
 as
 begin
 
@@ -173,7 +187,8 @@ FROM            Sucursal INNER JOIN
                          DetallePedido ON OrderPedido.IdPedido = DetallePedido.IdPedido INNER JOIN
                          Producto ON DetallePedido.IdProducto = Producto.IdProducto INNER JOIN
                          Proveedor ON Producto.IdProveedor = Proveedor.IdProveedor
-where  CONVERT(VARCHAR(2),MONTH(OrderPedido.Fecha))=@mes
+where (convert(varchar, Fecha, 1) between @fechaInicio and @fechaFin) and OrderPedido.Estado='Cobrado'
+--CONVERT(VARCHAR(2),MONTH(OrderPedido.Fecha))=@mes
 
 select (select SUM(SubTotal) from #temp2) MontoTotal, NombreProducto,Precio_Entrega,Precio_Venta,Proveedor, sum(#temp2.Cantidad) Cantidad
 from #temp2

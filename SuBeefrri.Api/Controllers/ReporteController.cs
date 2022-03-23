@@ -3,7 +3,7 @@ using SuBeefrri.Services.Interfaces;
 
 namespace SuBeefrri.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class ReporteController : ControllerBase
     {
@@ -14,15 +14,15 @@ namespace SuBeefrri.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Reporte1()
+        public async Task<IActionResult> Reporte1(DateTime fechaInicio, DateTime fechaFin)
         {
-            return Ok(await Repository.Reporte1());
+            return Ok(await Repository.Reporte1(fechaInicio, fechaFin));
         }
 
-        [HttpGet("{numeroMes}")]
-        public async Task<IActionResult> Reporte2(int numeroMes)
+        [HttpGet]
+        public async Task<IActionResult> Reporte2(DateTime fechaInicio, DateTime fechaFin)
         {
-            return Ok(await Repository.Reporte2(numeroMes));
+            return Ok(await Repository.Reporte2(fechaInicio, fechaFin));
         }
     }
 }
