@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 using SuBeefrri.Core.Dtos;
 using SuBeefrri.Core.Entities;
 
@@ -19,6 +16,7 @@ namespace SuBeefrri.Contexts.DataContext
         }
 
         public virtual DbSet<Cobro> Cobros { get; set; } = null!;
+        public virtual DbSet<DetallePago> DetallePagos { get; set; } = null!;
         public virtual DbSet<DetallePedido> DetallePedidos { get; set; } = null!;
         public virtual DbSet<Entrega> Entregas { get; set; } = null!;
         public virtual DbSet<OrderPedido> OrderPedidos { get; set; } = null!;
@@ -30,6 +28,7 @@ namespace SuBeefrri.Contexts.DataContext
         public virtual DbSet<Usuario> Usuarios { get; set; } = null!;
         public DbSet<Report1DTO> Reporte1 { get; set; }
         public DbSet<Reporte2DTO> Reporte2 { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Report1DTO>().HasNoKey().ToView(null);
@@ -53,6 +52,33 @@ namespace SuBeefrri.Contexts.DataContext
                     .WithMany(p => p.Cobros)
                     .HasForeignKey(d => d.IdUsuario)
                     .HasConstraintName("fk_Usuario_Cobro");
+            });
+
+            modelBuilder.Entity<DetallePago>(entity =>
+            {
+                entity.HasKey(e => e.IdDetallePago)
+                    .HasName("pk_DetallePago");
+
+                entity.ToTable("DetallePago");
+
+                entity.Property(e => e.DireccionFoto)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Monto).HasColumnType("decimal(7, 2)");
+
+                entity.Property(e => e.NombreBanco)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.NumeroTransferencia)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.IdOrderPedidoNavigation)
+                    .WithMany(p => p.DetallePagos)
+                    .HasForeignKey(d => d.IdOrderPedido)
+                    .HasConstraintName("fk_OrderPedido_DetallePago");
             });
 
             modelBuilder.Entity<DetallePedido>(entity =>

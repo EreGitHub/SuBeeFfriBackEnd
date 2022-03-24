@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
+using SuBeefrri.Api.DTOs;
 using SuBeefrri.Core.Dtos;
 using SuBeefrri.Services.Interfaces;
 
@@ -10,9 +10,11 @@ namespace SuBeefrri.Api.Controllers
     public class OrdenPedidoController : ControllerBase
     {
         private readonly IOrdenPedidoRepository Repository;
-        public OrdenPedidoController(IOrdenPedidoRepository repository)
+        private readonly IWebHostEnvironment HostEnvironment;
+        public OrdenPedidoController(IOrdenPedidoRepository repository, IWebHostEnvironment hostEnvironment)
         {
             Repository = repository;
+            HostEnvironment = hostEnvironment;
         }
 
         [HttpGet]
@@ -28,10 +30,31 @@ namespace SuBeefrri.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Orden(OrdenPedidoDTO dto)
+        public async Task<IActionResult> OrdenSinPago(OrdenPedidoDTO dto)
         {
-            var oOrden = await Repository.Orden(dto);
+            var oOrden = await Repository.OrdenarSinPago(dto);
             return Ok(oOrden);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> OrdenConPago(OrdenPedidoDTO dto)
+        {
+            var result = await Repository.OrdenConPago(dto);
+            return Ok(result);
+        }
+        [HttpPost]
+        public async Task<IActionResult> AdjuntarComprobantePago([FromForm] AdjuntarComprobantePagoDTO dto)
+        {
+            var DireccionFoto = await subirArchivo();
+            await Repository.AdjuntarOrdenPago(new OrdenConPagoAdjuntoDTO
+            {
+                NumeroTransferencia = dto.NumeroTransferencia,
+                NombreBanco = dto.NombreBanco,
+                Monto = dto.Monto,
+                DireccionFoto = DireccionFoto,
+                IdOrderPedido = dto.IdOrderPedido
+            });
+            return Ok();
         }
 
         [HttpPost]
@@ -42,17 +65,32 @@ namespace SuBeefrri.Api.Controllers
         }
 
         [HttpPost("{idPedido}")]
-        public async Task<IActionResult> Aprobar(int idPedido)
+        public async Task<IActionResult> Enviar(int idPedido)
         {
-            await Repository.Aprobar(idPedido);
+            await Repository.Enviada(idPedido);
             return Ok();
         }
 
-        [HttpPost("{idPedido}")]
-        public async Task<IActionResult> Rechazar(int idPedido)
+        //[HttpPost("{idPedido}")]
+        //public async Task<IActionResult> Rechazar(int idPedido)
+        //{
+        //    await Repository.Rechazar(idPedido);
+        //    return Ok();
+        //}
+
+        private async Task<string> subirArchivo()
         {
-            await Repository.Rechazar(idPedido);
-            return Ok();
+            var archivo = HttpContext.Request.Form.Files[0];
+            string miRuta = HostEnvironment.WebRootPath;
+            string uploads = Path.Combine(miRuta, "archivos");
+            var NombreArchivo = Guid.NewGuid().ToString();
+            var Extencion = Path.GetExtension(archivo.FileName);
+            using (var fileStreams = new FileStream(Path.Combine(uploads, NombreArchivo + Extencion), FileMode.Create))
+            {
+                await archivo.CopyToAsync(fileStreams);
+            }
+            var location = new Uri($"{Request.Scheme}://{Request.Host}{Path.Combine("/archivos", NombreArchivo + Extencion)}");
+            return location.AbsoluteUri;
         }
     }
 }

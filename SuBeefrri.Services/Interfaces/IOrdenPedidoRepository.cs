@@ -4,11 +4,12 @@ namespace SuBeefrri.Services.Interfaces
 {
     public interface IOrdenPedidoRepository
     {
-        Task Aprobar(int idPedido);
+        Task Enviada(int idPedido);
         Task<IEnumerable<OrdenesListaDTO>> ListarOrdenes();
         Task<List<ProductosPorUsuarioDTO>> ListarOrdenesPorUsuario(int idUsuario);
-        Task<OrdenPedidoDTO> Orden(OrdenPedidoDTO dto);
+        Task<OrdenPedidoDTO> OrdenarSinPago(OrdenPedidoDTO dto);
         Task Cobrar(int idPedido, int idUsuarioCobrador);
-        Task Rechazar(int idPedido);
+        Task<OrdenPedidoDTO> OrdenConPago(OrdenPedidoDTO orden);
+        Task AdjuntarOrdenPago(OrdenConPagoAdjuntoDTO orden);
     }
 }

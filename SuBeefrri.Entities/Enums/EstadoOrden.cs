@@ -2,6 +2,7 @@
 {
     public enum EstadoOrden
     {
-        Aprobado, Rechazado, Pendiente, Cobrado
+        Pedidos, Enviadas, Cobradas
+        //Aprobado, Rechazado, Pendiente, Cobrado
     }
 }

@@ -7,6 +7,7 @@ namespace SuBeefrri.Core.Entities
     {
         public OrderPedido()
         {
+            DetallePagos = new HashSet<DetallePago>();
             DetallePedidos = new HashSet<DetallePedido>();
         }
 
@@ -17,6 +18,7 @@ namespace SuBeefrri.Core.Entities
         public string Estado { get; set; } = null!;
 
         public virtual Usuario IdUsuarioNavigation { get; set; } = null!;
+        public virtual ICollection<DetallePago> DetallePagos { get; set; }
         public virtual ICollection<DetallePedido> DetallePedidos { get; set; }
     }
 }

@@ -63,6 +63,17 @@ constraint pk_OrderPedido primary key(IdPedido),
 constraint fk_Usuario_OrderPedido foreign key(IdUsuario) references Usuario(IdUsuario) on update cascade on delete cascade,
 );
 
+create table DetallePago(
+IdDetallePago int identity(1,1)not null,
+NumeroTransferencia varchar(50),
+NombreBanco varchar(50),
+Monto decimal(7,2),
+DireccionFoto varchar(200),
+IdOrderPedido int not null,
+constraint pk_DetallePago primary key(IdDetallePago),
+constraint fk_OrderPedido_DetallePago foreign key(IdOrderPedido)references OrderPedido(IdPedido) on delete cascade on update cascade
+);
+
 create table Producto (
 IdProducto int identity(1,1) not null,
 Nombre varchar(50) not null,
@@ -108,7 +119,7 @@ constraint fk_Usuario_Cobro foreign key(IdUsuario) references Usuario(IdUsuario)
 );
 
 select * from Sucursal
-insert into Sucursal values('Siucursal 1','Sin Direccion'),('Siucursal 2','Sin Direccion'),('Siucursal 3','Sin Direccion'),('Siucursal 4','Sin Direccion')
+insert into Sucursal values('Siucursal La Loma','Sin Direccion'),('Siucursal Campesino','Sin Direccion'),('Siucursal La Villa','Sin Direccion'),('Siucursal San Martin','Sin Direccion')
 
 select * from Persona
 insert into Persona values('Juan Perez','Rios','12334','Sin Direccion',null),('Pedro Juan','Ortega','765464','Sin Direccion',null)
@@ -121,7 +132,7 @@ insert into Usuario values ('123','123',1,1,1)
 insert into Usuario values ('321','321',2,2,2)
 
 select * from Proveedor
-insert into Proveedor values('Proveedor 1','Sin Nit'),('Proveedor 2','Sin Nit'),('Proveedor 3','Sin Nit'),('Proveedor 4','Sin Nit')
+insert into Proveedor values('Proveedor San Juan','Sin Nit'),('Proveedor La Loma','Sin Nit'),('Proveedor Don Jacinto','Sin Nit'),('Proveedor San Pedro','Sin Nit')
 
 select * from Producto 
 insert into Producto values ('Producto 1',GETDATE(),10,20,10,10,1,null)
@@ -200,3 +211,4 @@ end
 go
 
 select * from OrderPedido
+select * from DetallePago

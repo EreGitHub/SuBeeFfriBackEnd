@@ -30,7 +30,15 @@ namespace SuBeefrri.Services.Repository
             Mail = mail;
             HubContext = hubContext;
         }
-        public async Task<OrdenPedidoDTO> Orden(OrdenPedidoDTO dto)
+        public async Task<OrdenPedidoDTO> OrdenarSinPago(OrdenPedidoDTO dto)
+        {
+            var result = await AgregarOrden(dto);
+            await HubContext.Clients.All.BroadcastMessage(true);
+            await Mail.Send("Nueva orden creada");
+            return result;
+        }
+
+        private async Task<OrdenPedidoDTO> AgregarOrden(OrdenPedidoDTO dto)
         {
             OrdenPedidoValidator Validator = new();
             ValidationResult validationResult = await Validator.ValidateAsync(dto);
@@ -54,14 +62,11 @@ namespace SuBeefrri.Services.Repository
             var numeroOrden = Context.OrderPedidos.Count() + 1;
             dto.NroPedido = numeroOrden;
             var oOrden = Mapper.Map<OrderPedido>(dto);
-            oOrden.Estado = EstadoOrden.Pendiente.ToString();
-            Context.Add(oOrden);
+            oOrden.Estado = EstadoOrden.Pedidos.ToString();
+            await Context.AddAsync(oOrden);
             await Context.SaveChangesAsync();
-            await HubContext.Clients.All.BroadcastMessage(true);
-            await Mail.Send("Nueva orden creada");
             return Mapper.Map<OrdenPedidoDTO>(oOrden);
         }
-
         public async Task<IEnumerable<OrdenesListaDTO>> ListarOrdenes()
         {
             List<OrdenesListaDTO> lst = new();
@@ -97,44 +102,57 @@ namespace SuBeefrri.Services.Repository
             List<ProductosPorUsuarioDTO> lst = new List<ProductosPorUsuarioDTO>();
             var oUsuario = await Context.Usuarios.SingleOrDefaultAsync(q => q.IdUsuario == idUsuario);
             var orderPedido = await Context.OrderPedidos.Where(q => q.IdUsuario == idUsuario).ToListAsync();
-            var oSucursal = await Context.Sucursals.SingleOrDefaultAsync(q => q.IdSucursal == oUsuario.IdSucursal);
+            var oSucursal = await Context.Sucursals.SingleOrDefaultAsync(q => q.IdSucursal == oUsuario!.IdSucursal);
             foreach (var itemOrden in orderPedido)
             {
-
+                var obj = new ProductosPorUsuarioDTO
+                {
+                    IdPerdido = itemOrden.IdPedido,
+                    NumeroPedido = itemOrden.NroPedido,
+                    Fecha = itemOrden.Fecha,
+                    Estado = itemOrden.Estado,
+                    NombreSucursal = oSucursal!.Nombre
+                };
+                var DetallePago = await Context.DetallePagos.FirstOrDefaultAsync(q => q.IdOrderPedido == itemOrden.IdPedido);
+                if (DetallePago != default)
+                    obj.DetallePago = new DetallePagoDTO
+                    {
+                        NumeroTranferencia = DetallePago.NumeroTransferencia,
+                        NombreBanco = DetallePago?.NombreBanco,
+                        Monto = (decimal)DetallePago!.Monto!,
+                        DireccionFoto = DetallePago.DireccionFoto
+                    };
                 var lstDetalle = await Context.DetallePedidos.Where(q => q.IdPedido == itemOrden.IdPedido).ToListAsync();
                 foreach (var itemDetalle in lstDetalle)
                 {
+                    obj.MontoTotal += itemDetalle.SubTotal;
                     var oProduct = await Context.Productos.SingleOrDefaultAsync(q => q.IdProducto == itemDetalle.IdProducto);
-                    lst.Add(new ProductosPorUsuarioDTO
+                    obj.DetalleProducto!.Add(new ProductoPorUsuarioDTO
                     {
-                        IdPerdido = itemOrden.IdPedido,
-                        NombreProducto = oProduct.Nombre,
-                        NombreSucursal = oSucursal.Nombre,
-                        NumeroPedido = itemOrden.NroPedido,
+                        NombreProducto = oProduct!.Nombre,
                         Cantidad = itemDetalle.Cantidad,
                         SubTotal = itemDetalle.SubTotal,
-                        Fecha = itemOrden.Fecha,
-                        Estado = itemOrden.Estado,
-                        DireccionFoto = oProduct.DireccionFoto
+                        DireccionFoto = oProduct.DireccionFoto!
                     });
                 }
+                lst.Add(obj);
             }
             return lst;
         }
 
-        public async Task Aprobar(int idPedido)
+        public async Task Enviada(int idPedido)
         {
             var oOrden = await Context.OrderPedidos.SingleOrDefaultAsync(o => o.IdPedido == idPedido);
             if (oOrden == null)
                 throw new CustomException("El numero de orden proporcionado no existe");
-            oOrden!.Estado = EstadoOrden.Aprobado.ToString();
+            oOrden!.Estado = EstadoOrden.Enviadas.ToString();
             await Context.SaveChangesAsync();
         }
 
         public async Task Cobrar(int idPedido, int idUsuarioCobrador)
         {
             var ordenPedidos = await Context.OrderPedidos.Where(q => q.IdPedido == idPedido).FirstOrDefaultAsync();
-            ordenPedidos.Estado = EstadoOrden.Cobrado.ToString();
+            ordenPedidos!.Estado = EstadoOrden.Cobradas.ToString();
             Context.SaveChanges();
             var DetallePedido = await Context.DetallePedidos.Where(q => q.IdPedido == idPedido).ToListAsync();
             foreach (var item in DetallePedido)
@@ -154,13 +172,31 @@ namespace SuBeefrri.Services.Repository
             }
         }
 
-        public async Task Rechazar(int idPedido)
+        //public async Task Rechazar(int idPedido)
+        //{
+        //    var oOrden = await Context.OrderPedidos.SingleOrDefaultAsync(o => o.IdPedido == idPedido);
+        //    if (oOrden == null)
+        //        throw new CustomException("El numero de orden proporcionado no existe");
+        //    oOrden!.Estado = EstadoOrden.Rechazado.ToString();
+        //    await Context.SaveChangesAsync();
+        //}
+
+        public async Task<OrdenPedidoDTO> OrdenConPago(OrdenPedidoDTO orden) => await AgregarOrden(orden);
+
+        public async Task AdjuntarOrdenPago(OrdenConPagoAdjuntoDTO orden)
         {
-            var oOrden = await Context.OrderPedidos.SingleOrDefaultAsync(o => o.IdPedido == idPedido);
-            if (oOrden == null)
-                throw new CustomException("El numero de orden proporcionado no existe");
-            oOrden!.Estado = EstadoOrden.Rechazado.ToString();
+            var detallePago = new DetallePago
+            {
+                NumeroTransferencia = orden.NumeroTransferencia,
+                NombreBanco = orden.NombreBanco,
+                Monto = orden.Monto,
+                DireccionFoto = orden.DireccionFoto,
+                IdOrderPedido = orden.IdOrderPedido
+            };
+            await Context.AddAsync(detallePago);
             await Context.SaveChangesAsync();
+            await HubContext.Clients.All.BroadcastMessage(true);
+            await Mail.Send("Nueva orden creada con tranferencia");
         }
     }
 }
