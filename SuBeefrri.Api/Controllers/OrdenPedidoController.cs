@@ -71,13 +71,6 @@ namespace SuBeefrri.Api.Controllers
             return Ok();
         }
 
-        //[HttpPost("{idPedido}")]
-        //public async Task<IActionResult> Rechazar(int idPedido)
-        //{
-        //    await Repository.Rechazar(idPedido);
-        //    return Ok();
-        //}
-
         private async Task<string> subirArchivo()
         {
             var archivo = HttpContext.Request.Form.Files[0];

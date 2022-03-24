@@ -82,6 +82,15 @@ namespace SuBeefrri.Services.Repository
                     Fecha = itemOrden.Fecha,
                     EstadoOrden = itemOrden.Estado
                 };
+                var detallePago = await Context.DetallePagos.FirstOrDefaultAsync(q => q.IdOrderPedido == itemOrden.IdPedido);
+                if (detallePago != default)
+                    orden.DetallePago = new DetallePagoDTO
+                    {
+                        NumeroTranferencia = detallePago.NumeroTransferencia,
+                        NombreBanco = detallePago.NombreBanco,
+                        Monto = (decimal)detallePago.Monto!,
+                        DireccionFoto = detallePago.DireccionFoto
+                    };
                 foreach (var itemDetallePedido in await Context.DetallePedidos.Where(o => o.IdPedido == itemOrden.IdPedido).ToArrayAsync())
                 {
                     orden.MontoTotal += itemDetallePedido.SubTotal;
