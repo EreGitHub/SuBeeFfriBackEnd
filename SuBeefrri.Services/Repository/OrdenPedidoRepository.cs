@@ -62,7 +62,7 @@ namespace SuBeefrri.Services.Repository
             var numeroOrden = Context.OrderPedidos.Count() + 1;
             dto.NroPedido = numeroOrden;
             var oOrden = Mapper.Map<OrderPedido>(dto);
-            oOrden.Estado = EstadoOrden.Pedidos.ToString();
+            oOrden.Estado = EstadoOrden.Pedido.ToString();
             await Context.AddAsync(oOrden);
             await Context.SaveChangesAsync();
             return Mapper.Map<OrdenPedidoDTO>(oOrden);
@@ -145,7 +145,7 @@ namespace SuBeefrri.Services.Repository
             var oOrden = await Context.OrderPedidos.SingleOrDefaultAsync(o => o.IdPedido == idPedido);
             if (oOrden == null)
                 throw new CustomException("El numero de orden proporcionado no existe");
-            oOrden!.Estado = EstadoOrden.Enviadas.ToString();
+            oOrden!.Estado = EstadoOrden.Enviado.ToString();
             await Context.SaveChangesAsync();
         }
 
