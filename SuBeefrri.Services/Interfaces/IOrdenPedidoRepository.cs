@@ -5,6 +5,7 @@ namespace SuBeefrri.Services.Interfaces
     public interface IOrdenPedidoRepository
     {
         Task Enviada(int idPedido);
+        Task EnviarOrdenPagada(int idPedido, int idUsuarioCobrador);
         Task<IEnumerable<OrdenesListaDTO>> ListarOrdenes();
         Task<List<ProductosPorUsuarioDTO>> ListarOrdenesPorUsuario(int idUsuario);
         Task<OrdenPedidoDTO> OrdenarSinPago(OrdenPedidoDTO dto);

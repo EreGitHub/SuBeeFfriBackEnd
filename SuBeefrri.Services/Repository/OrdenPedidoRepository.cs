@@ -161,8 +161,10 @@ namespace SuBeefrri.Services.Repository
         public async Task Cobrar(int idPedido, int idUsuarioCobrador)
         {
             var ordenPedidos = await Context.OrderPedidos.Where(q => q.IdPedido == idPedido).FirstOrDefaultAsync();
+            if (ordenPedidos == default)
+                throw new CustomException("El numero de orden proporcionado no existe");
             ordenPedidos!.Estado = EstadoOrden.Cobradas.ToString();
-            Context.SaveChanges();
+            await Context.SaveChangesAsync();
             var DetallePedido = await Context.DetallePedidos.Where(q => q.IdPedido == idPedido).ToListAsync();
             foreach (var item in DetallePedido)
             {
@@ -170,25 +172,16 @@ namespace SuBeefrri.Services.Repository
                 entrega.Fecha = DateTime.Now;
                 entrega.Estado = 1;
                 entrega.IdDetalle = item.IdDetalle;
-                Context.Entregas.Add(entrega);
-                Context.SaveChanges();
+                await Context.Entregas.AddAsync(entrega);
+                await Context.SaveChangesAsync();
                 Cobro cobro = new Cobro();
                 cobro.FechaCobro = DateTime.Now;
                 cobro.IdUsuario = idUsuarioCobrador;
                 cobro.IdEntrega = entrega.IdEntrega;
-                Context.Cobros.Add(cobro);
-                Context.SaveChanges();
+                await Context.Cobros.AddAsync(cobro);
+                await Context.SaveChangesAsync();
             }
         }
-
-        //public async Task Rechazar(int idPedido)
-        //{
-        //    var oOrden = await Context.OrderPedidos.SingleOrDefaultAsync(o => o.IdPedido == idPedido);
-        //    if (oOrden == null)
-        //        throw new CustomException("El numero de orden proporcionado no existe");
-        //    oOrden!.Estado = EstadoOrden.Rechazado.ToString();
-        //    await Context.SaveChangesAsync();
-        //}
 
         public async Task<OrdenPedidoDTO> OrdenConPago(OrdenPedidoDTO orden) => await AgregarOrden(orden);
 
@@ -207,5 +200,8 @@ namespace SuBeefrri.Services.Repository
             await HubContext.Clients.All.BroadcastMessage(true);
             await Mail.Send("Nueva orden creada con tranferencia");
         }
+
+        public async Task EnviarOrdenPagada(int idPedido, int idUsuarioCobrador) => await Cobrar(idPedido, idUsuarioCobrador);
+
     }
 }

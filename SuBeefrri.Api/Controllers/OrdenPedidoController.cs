@@ -71,6 +71,13 @@ namespace SuBeefrri.Api.Controllers
             return Ok();
         }
 
+        [HttpPost]
+        public async Task<IActionResult> EnviarOrdenPagada(int idPedido, int idUsuarioCobrador)
+        {
+            await Repository.EnviarOrdenPagada(idPedido, idUsuarioCobrador);
+            return Ok();
+        }
+
         private async Task<string> subirArchivo()
         {
             var archivo = HttpContext.Request.Form.Files[0];
