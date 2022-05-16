@@ -18,9 +18,7 @@ namespace SuBeefrri.Services.Repository
 
         public async Task<Reporte1ResponceDTO> Reporte1(DateTime fechaInicio, DateTime fechaFin)
         {
-            string _fechaInicio = fechaInicio.ToString("MM/dd/yy");
-            string _fechaFin = fechaFin.ToString("MM/dd/yy");
-            var query = $"sp_reporte1 '{_fechaInicio}', '{_fechaFin}'";
+            var query = $"sp_ReporteSucursalConMasPedidos '{fechaInicio}', '{fechaFin}'";
             var responce = await Context.Set<Report1DTO>().FromSqlRaw(query).ToListAsync();
             var obj = new Reporte1ResponceDTO
             {
@@ -43,9 +41,7 @@ namespace SuBeefrri.Services.Repository
 
         public async Task<Reporte2ResponceDTO> Reporte2(DateTime fechaInicio, DateTime fechaFin)
         {
-            string _fechaInicio = fechaInicio.ToString("MM/dd/yy");
-            string _fechaFin = fechaFin.ToString("MM/dd/yy");
-            string query = $"exec sp_ReporteProductosMasVendidos '{_fechaInicio}', '{_fechaFin}'";
+            string query = $"exec sp_ReporteProductosMasVendidos '{fechaInicio}', '{fechaFin}'";
             var responce = await Context.Set<Reporte2DTO>().FromSqlRaw(query).ToListAsync();
             var obj = new Reporte2ResponceDTO
             {

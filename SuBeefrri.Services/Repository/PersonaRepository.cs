@@ -35,10 +35,14 @@ namespace SuBeefrri.Services.Repository
                 string Message = validationResult.ToString("-");
                 throw new CustomException(Message);
             }
+            var existing = await Context.Personas.SingleOrDefaultAsync(o => o.Ci == dto.Ci);
+            if (existing != null)
+                throw new CustomException("Existe un registro con el mismo número: " + dto.Ci);
+
             var oPersona = Mapper.Map<Persona>(dto);
-            Context.Add(oPersona);
+            Context.Add(existing);
             await Context.SaveChangesAsync();
-            return Mapper.Map<PersonaDTO>(oPersona);
+            return Mapper.Map<PersonaDTO>(existing);
         }
 
         public async Task Update(int id, PersonaDTO dto)

@@ -13,7 +13,7 @@ namespace SuBeefrri.Services.Filters
             if (context.Exception.GetType() == typeof(CustomException))
                 exception = ((CustomException)context.Exception).Message;
             else
-                exception = "Ocurrio un error interno...!!!";
+                exception = "Ocurrio un error interno en el servidor...!!!";
             var f = context.Exception;
             context.Result = new BadRequestObjectResult(exception);
             context.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
